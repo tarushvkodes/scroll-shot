@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_HELPER = ROOT / "bin" / "scrollshot-scroll"
 DEFAULT_DETECT_HELPER = ROOT / "bin" / "scrollshot-detect"
 DEFAULT_COUNTDOWN_HELPER = ROOT / "bin" / "scrollshot-countdown"
+DEFAULT_OUTPUT_DIR = Path.home() / "Downloads"
 
 
 def build_helper(helper: Path, detect_helper: Path, countdown_helper: Path) -> None:
@@ -103,7 +104,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Saved {output}")
         return 0
 
-    output = args.output or Path.cwd() / f"scroll-shot-{datetime.now().strftime('%Y%m%d-%H%M%S')}.png"
+    output = args.output or DEFAULT_OUTPUT_DIR / f"scroll-shot-{datetime.now().strftime('%Y%m%d-%H%M%S')}.png"
 
     target_mode = "manual" if args.manual else args.target
 

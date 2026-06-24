@@ -100,7 +100,7 @@ under the pointer and captures that region. No drawing is needed.
 Keep the target visible while Scroll Shot captures and scrolls.
 By default, capture continues until the selected region stops moving.
 
-The default output is written to the current directory as:
+The default output is written to `~/Downloads` as:
 
 ```text
 scroll-shot-YYYYMMDD-HHMMSS.png
