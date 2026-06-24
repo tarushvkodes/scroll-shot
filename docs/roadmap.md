@@ -4,6 +4,8 @@
 
 - [x] Region selection overlay.
 - [x] Manual scroll target selection.
+- [x] Hover-to-target scroll region detection.
+- [x] Frontmost-window scroll region detection.
 - [x] Native screenshot capture.
 - [x] Automated scroll loop.
 - [x] Basic overlap stitching.

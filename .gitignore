@@ -12,3 +12,5 @@ DerivedData/
 *.xcuserstate
 captures/
 debug-frames/
+scroll-shot-*.png
+__pycache__/

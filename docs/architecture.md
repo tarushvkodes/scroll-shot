@@ -106,6 +106,8 @@ The current macOS MVP is implemented as:
 
 - Python CLI in `src/scrollshot`.
 - Tk-based region selector in `selection.py`.
+- Accessibility-based automatic target detection in `targeting.py` and
+  `platform/macos/ScrollShotDetectHelper.swift`.
 - Pillow screen capture in `capture.py`.
 - OpenCV/Numpy overlap stitching in `stitch.py`.
 - Swift/CoreGraphics scroll helper in

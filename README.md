@@ -71,12 +71,15 @@ technical plan.
 Scroll Shot now includes a macOS MVP:
 
 - Drag-to-select region picker.
+- Hover-to-target automatic scroll region detection.
+- Frontmost-window automatic scroll region detection.
 - Native desktop screenshot capture.
 - Native macOS scroll input helper.
-- Multi-frame capture loop.
+- Multi-frame capture loop with first-run scroll direction calibration.
 - Overlap-based image stitching.
 - Lossless PNG export.
 - Optional debug frame export.
+- Deterministic stitching self-test.
 
 This is an early prototype. It is already useful for scrollable desktop regions,
 but difficult targets such as virtualized lists, sticky headers, and animated
@@ -88,8 +91,11 @@ chat UIs may still need tuning.
 make capture
 ```
 
-Then drag around the scrollable part of the screen. Keep the target visible while
-Scroll Shot captures and scrolls.
+Then move your pointer over the content that should scroll during the countdown.
+Scroll Shot asks macOS Accessibility for the UI region under the pointer and
+captures that region. No drawing is needed.
+
+Keep the target visible while Scroll Shot captures and scrolls.
 
 The default output is written to the current directory as:
 
@@ -106,23 +112,51 @@ PYTHONPATH=src python3 -m scrollshot --help
 Useful options:
 
 ```bash
-PYTHONPATH=src python3 -m scrollshot \
+PYTHONPATH=src python3 -m scrollshot capture \
   --output captures/thread.png \
   --frames 24 \
-  --delta-y -850 \
-  --delay 0.45 \
+  --delta-y 750 \
+  --scroll-ticks 7 \
+  --delay 0.55 \
   --debug-dir debug-frames/thread
 ```
+
+Targeting modes:
+
+```bash
+# Default: hover over the scrollable content during the countdown.
+PYTHONPATH=src python3 -m scrollshot capture --target hover
+
+# Fully automatic: choose the best-looking scrollable region in the frontmost window.
+PYTHONPATH=src python3 -m scrollshot capture --target auto
+
+# Fallback: draw a region manually.
+PYTHONPATH=src python3 -m scrollshot capture --target manual
+```
+
+Run the deterministic stitcher test:
+
+```bash
+make self-test
+```
+
+That creates `scroll-shot-self-test.png` from synthetic scrolling frames and
+checks the final stitched dimensions.
 
 ### macOS Permissions
 
 Scroll Shot may need:
 
 - Screen Recording permission to read pixels.
-- Accessibility permission to send scroll input.
+- Accessibility permission to detect UI regions and send scroll input.
 
 If scrolling does not happen, open System Settings and grant Accessibility
 permission to the terminal app running Scroll Shot.
+
+If Scroll Shot captures only one frame, it means the selected area did not
+visibly change after it tried both scroll directions. Usually that means the
+detected target was not the scrolling pane, the content was already at the end,
+or Accessibility permission is missing.
 
 ## Development
 

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import tkinter as tk
 from typing import Optional, Tuple
 
-from PIL import Image, ImageGrab, ImageTk
+from PIL import ImageGrab
 
 
 @dataclass(frozen=True)
@@ -26,39 +26,44 @@ class RegionSelector:
         self.root.withdraw()
         self.screen_w = self.root.winfo_screenwidth()
         self.screen_h = self.root.winfo_screenheight()
-        self.screenshot = ImageGrab.grab().convert("RGB")
-        self.scale_x = self.screenshot.width / self.screen_w
-        self.scale_y = self.screenshot.height / self.screen_h
+        screenshot = ImageGrab.grab()
+        self.scale_x = screenshot.width / self.screen_w
+        self.scale_y = screenshot.height / self.screen_h
         self.result: Optional[Selection] = None
         self.start: Optional[Tuple[int, int]] = None
         self.rect_id: Optional[int] = None
+        self.label_id: Optional[int] = None
 
     def run(self) -> Optional[Selection]:
         win = tk.Toplevel(self.root)
         win.attributes("-fullscreen", True)
         win.attributes("-topmost", True)
+        win.attributes("-alpha", 0.28)
         win.configure(cursor="crosshair")
         win.title("Scroll Shot Region Selection")
 
-        display = self.screenshot.resize((self.screen_w, self.screen_h), Image.Resampling.LANCZOS)
-        dark = Image.blend(display, Image.new("RGB", display.size, "black"), 0.35)
-        self.photo = ImageTk.PhotoImage(dark)
-
-        canvas = tk.Canvas(win, width=self.screen_w, height=self.screen_h, highlightthickness=0)
+        canvas = tk.Canvas(
+            win,
+            width=self.screen_w,
+            height=self.screen_h,
+            highlightthickness=0,
+            bg="black",
+        )
         canvas.pack(fill=tk.BOTH, expand=True)
-        canvas.create_image(0, 0, anchor=tk.NW, image=self.photo)
         canvas.create_text(
             self.screen_w // 2,
             34,
-            text="Drag around the scrollable area. Press Esc to cancel.",
+            text="Drag around the scrolling content. Center the box over the pane that should move. Esc cancels.",
             fill="white",
-            font=("Helvetica", 18, "bold"),
+            font=("Helvetica", 16, "bold"),
         )
 
         def on_down(event: tk.Event) -> None:
             self.start = (event.x, event.y)
             if self.rect_id is not None:
                 canvas.delete(self.rect_id)
+            if self.label_id is not None:
+                canvas.delete(self.label_id)
             self.rect_id = canvas.create_rectangle(
                 event.x,
                 event.y,
@@ -73,6 +78,21 @@ class RegionSelector:
                 return
             x0, y0 = self.start
             canvas.coords(self.rect_id, x0, y0, event.x, event.y)
+            left, right = sorted((x0, event.x))
+            top, bottom = sorted((y0, event.y))
+            label = f"{abs(right - left)} x {abs(bottom - top)}"
+            if self.label_id is None:
+                self.label_id = canvas.create_text(
+                    left + 8,
+                    max(18, top - 18),
+                    anchor=tk.W,
+                    text=label,
+                    fill="#44d7ff",
+                    font=("Helvetica", 13, "bold"),
+                )
+            else:
+                canvas.coords(self.label_id, left + 8, max(18, top - 18))
+                canvas.itemconfigure(self.label_id, text=label)
 
         def on_up(event: tk.Event) -> None:
             if self.start is None:
