@@ -68,8 +68,9 @@ technical plan.
 
 ## Current MVP
 
-Scroll Shot now includes a macOS MVP:
+Scroll Shot now includes:
 
+- Browser/Atlas extension for DOM-aware scrolling screenshots.
 - Drag-to-select region picker.
 - Hover-to-target automatic scroll region detection.
 - Frontmost-window automatic scroll region detection.
@@ -88,6 +89,22 @@ but difficult targets such as virtualized lists, sticky headers, and animated
 chat UIs may still need tuning.
 
 ## Quick Start
+
+### Browser Extension
+
+For browser chats and pages, use the extension first. It is more accurate than
+desktop capture because it can use DOM scroll positions.
+
+Load this folder as an unpacked Chrome/Atlas extension:
+
+```text
+extension
+```
+
+Then hover the chat pane, click the extension icon, and choose Capture scroll
+area. See [extension/README.md](extension/README.md).
+
+### Desktop Tool
 
 ```bash
 make capture

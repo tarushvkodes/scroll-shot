@@ -1,9 +1,10 @@
-.PHONY: build-helper capture help self-test
+.PHONY: build-helper capture extension-folder help self-test
 
 help:
 	@echo "Targets:"
 	@echo "  build-helper  Compile the macOS native scroll helper"
 	@echo "  capture       Run Scroll Shot from the source tree"
+	@echo "  extension-folder  Open the unpacked browser extension folder"
 	@echo "  self-test     Run deterministic stitching self-test"
 
 build-helper:
@@ -17,3 +18,6 @@ capture: build-helper
 
 self-test:
 	PYTHONPATH=src python3 -m scrollshot self-test --output scroll-shot-self-test.png
+
+extension-folder:
+	open extension

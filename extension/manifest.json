@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Scroll Shot",
+  "version": "0.1.0",
+  "description": "Capture high-quality scrolling screenshots of webpages, chats, and nested scroll panes.",
+  "permissions": ["activeTab", "downloads", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_title": "Scroll Shot",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
