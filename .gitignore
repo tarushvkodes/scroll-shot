@@ -1,0 +1,13 @@
+.DS_Store
+.env
+.env.*
+node_modules/
+dist/
+build/
+.build/
+DerivedData/
+*.xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+captures/
+debug-frames/
