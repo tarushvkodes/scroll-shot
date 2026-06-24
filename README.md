@@ -76,7 +76,9 @@ Scroll Shot now includes a macOS MVP:
 - Native desktop screenshot capture.
 - Native macOS scroll input helper.
 - Multi-frame capture loop with first-run scroll direction calibration.
+- Capture-until-stop by default, with a high safety cap.
 - Overlap-based image stitching.
+- Sticky header and sticky bottom bar removal for chat-style interfaces.
 - Lossless PNG export.
 - Optional debug frame export.
 - Deterministic stitching self-test.
@@ -96,6 +98,7 @@ five-second countdown. Scroll Shot asks macOS Accessibility for the UI region
 under the pointer and captures that region. No drawing is needed.
 
 Keep the target visible while Scroll Shot captures and scrolls.
+By default, capture continues until the selected region stops moving.
 
 The default output is written to the current directory as:
 
@@ -114,13 +117,16 @@ Useful options:
 ```bash
 PYTHONPATH=src python3 -m scrollshot capture \
   --output captures/thread.png \
-  --frames 24 \
+  --frames 0 \
   --hover-delay 5 \
-  --delta-y 750 \
-  --scroll-ticks 7 \
+  --delta-y 520 \
+  --scroll-ticks 4 \
   --delay 0.55 \
   --debug-dir debug-frames/thread
 ```
+
+`--frames 0` is the default and means "keep going until scrolling stops." Use a
+positive value only when you want to cap a capture early.
 
 Targeting modes:
 

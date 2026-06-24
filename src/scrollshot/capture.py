@@ -89,13 +89,13 @@ def capture_sequence(
     debug_dir: Path | None,
     calibrate: bool = True,
 ) -> CaptureResult:
-    if frames < 1:
-        raise ValueError("frames must be at least 1")
+    capture_until_stop = frames <= 0
+    max_frames = 250 if capture_until_stop else frames
 
     target = selection.center_point
     unchanged_attempts = 0
 
-    if calibrate and frames > 1:
+    if calibrate and max_frames > 1:
         captured, active_delta, clicked_to_focus, reason = calibrate_scroll(selection, helper, delta_y, ticks, delay, debug_dir)
         if len(captured) == 1:
             return CaptureResult(captured, active_delta, clicked_to_focus, reason, 4)
@@ -106,7 +106,7 @@ def capture_sequence(
         reason = "captured requested frame count"
         save_debug_frame(debug_dir, captured[0], 1)
 
-    while len(captured) < frames:
+    while len(captured) < max_frames:
         scroll_once(helper, target, active_delta, ticks, click=False)
         time.sleep(delay)
         image = capture_region(selection)
@@ -116,5 +116,8 @@ def capture_sequence(
             break
         captured.append(image)
         save_debug_frame(debug_dir, image, len(captured))
+
+    if capture_until_stop and len(captured) >= max_frames:
+        reason = f"stopped at safety limit of {max_frames} frames"
 
     return CaptureResult(captured, active_delta, clicked_to_focus, reason, unchanged_attempts)

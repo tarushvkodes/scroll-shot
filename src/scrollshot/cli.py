@@ -36,17 +36,22 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
     capture = subcommands.add_parser("capture", help="Capture a scrolling screenshot.")
     capture.add_argument("-o", "--output", type=Path, help="Output PNG path.")
-    capture.add_argument("--frames", type=int, default=18, help="Maximum number of frames to capture.")
+    capture.add_argument(
+        "--frames",
+        type=int,
+        default=0,
+        help="Maximum number of frames to capture. Use 0 to keep going until scrolling stops.",
+    )
     capture.add_argument(
         "--delta-y",
         type=int,
-        default=750,
+        default=520,
         help="Native scroll delta. Scroll Shot will try the opposite direction if this does not move.",
     )
     capture.add_argument(
         "--scroll-ticks",
         type=int,
-        default=7,
+        default=4,
         help="Wheel events to send for each captured step.",
     )
     capture.add_argument("--delay", type=float, default=0.55, help="Seconds to wait after each scroll.")
@@ -178,7 +183,9 @@ def main(argv: list[str] | None = None) -> int:
             "\n".join(
                 (
                     f"frame={seam.frame_index + 1} overlap={seam.overlap} "
-                    f"sticky_top={seam.sticky_top} crop_top={seam.crop_top} score={seam.score:.3f}"
+                    f"sticky_top={seam.sticky_top} crop_top={seam.crop_top} "
+                    f"sticky_bottom={seam.sticky_bottom} crop_bottom={seam.crop_bottom} "
+                    f"score={seam.score:.3f}"
                 )
                 for seam in result.seams
             )
@@ -193,4 +200,7 @@ def main(argv: list[str] | None = None) -> int:
         sticky_count = sum(1 for seam in result.seams if seam.sticky_top)
         if sticky_count:
             print(f"Removed sticky top bands from {sticky_count} frame(s).")
+        sticky_bottom_count = sum(1 for seam in result.seams if seam.sticky_bottom)
+        if sticky_bottom_count:
+            print(f"Removed sticky bottom bars from {sticky_bottom_count} intermediate frame(s).")
     return 0
