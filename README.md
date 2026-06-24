@@ -66,10 +66,77 @@ See [docs/product-spec.md](docs/product-spec.md) and
 [docs/architecture.md](docs/architecture.md) for the initial product and
 technical plan.
 
-## Repository Status
+## Current MVP
 
-This repository is freshly initialized with product direction, architecture, and
-project scaffolding. Implementation work should start with the macOS MVP.
+Scroll Shot now includes a macOS MVP:
+
+- Drag-to-select region picker.
+- Native desktop screenshot capture.
+- Native macOS scroll input helper.
+- Multi-frame capture loop.
+- Overlap-based image stitching.
+- Lossless PNG export.
+- Optional debug frame export.
+
+This is an early prototype. It is already useful for scrollable desktop regions,
+but difficult targets such as virtualized lists, sticky headers, and animated
+chat UIs may still need tuning.
+
+## Quick Start
+
+```bash
+make capture
+```
+
+Then drag around the scrollable part of the screen. Keep the target visible while
+Scroll Shot captures and scrolls.
+
+The default output is written to the current directory as:
+
+```text
+scroll-shot-YYYYMMDD-HHMMSS.png
+```
+
+## CLI
+
+```bash
+PYTHONPATH=src python3 -m scrollshot --help
+```
+
+Useful options:
+
+```bash
+PYTHONPATH=src python3 -m scrollshot \
+  --output captures/thread.png \
+  --frames 24 \
+  --delta-y -850 \
+  --delay 0.45 \
+  --debug-dir debug-frames/thread
+```
+
+### macOS Permissions
+
+Scroll Shot may need:
+
+- Screen Recording permission to read pixels.
+- Accessibility permission to send scroll input.
+
+If scrolling does not happen, open System Settings and grant Accessibility
+permission to the terminal app running Scroll Shot.
+
+## Development
+
+Compile the native scroll helper:
+
+```bash
+make build-helper
+```
+
+Run from source:
+
+```bash
+PYTHONPATH=src python3 -m scrollshot
+```
 
 ## License
 

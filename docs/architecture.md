@@ -100,10 +100,25 @@ Scroll Shot should request permissions lazily and explain why they are needed:
 - Accessibility for scrolling and inspecting UI elements.
 - Input monitoring only if a platform feature requires it.
 
+## Current Implementation
+
+The current macOS MVP is implemented as:
+
+- Python CLI in `src/scrollshot`.
+- Tk-based region selector in `selection.py`.
+- Pillow screen capture in `capture.py`.
+- OpenCV/Numpy overlap stitching in `stitch.py`.
+- Swift/CoreGraphics scroll helper in
+  `platform/macos/ScrollShotScrollHelper.swift`.
+
+The helper is compiled into `bin/scrollshot-scroll` by `make build-helper` or
+automatically on first run.
+
 ## Repository Layout
 
 ```text
 docs/                 Product and engineering docs
+platform/macos/       Native macOS helper code
 src/                  Implementation source
 .github/              Issue templates and project hygiene
 ```

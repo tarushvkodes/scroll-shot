@@ -2,12 +2,15 @@
 
 ## Phase 1: macOS Prototype
 
-- Region selection overlay.
-- Manual scroll target selection.
-- Native screenshot capture.
-- Automated scroll loop.
-- Basic overlap stitching.
-- PNG export.
+- [x] Region selection overlay.
+- [x] Manual scroll target selection.
+- [x] Native screenshot capture.
+- [x] Automated scroll loop.
+- [x] Basic overlap stitching.
+- [x] PNG export.
+- [ ] Permission onboarding UI.
+- [ ] Preview before save.
+- [ ] Manual seam correction.
 
 ## Phase 2: Reliability
 

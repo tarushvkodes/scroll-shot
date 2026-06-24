@@ -2,6 +2,7 @@
 .env
 .env.*
 node_modules/
+bin/
 dist/
 build/
 .build/
