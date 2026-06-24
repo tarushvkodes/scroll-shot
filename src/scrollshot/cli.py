@@ -21,6 +21,17 @@ DEFAULT_COUNTDOWN_HELPER = ROOT / "bin" / "scrollshot-countdown"
 DEFAULT_OUTPUT_DIR = Path.home() / "Downloads"
 
 
+def print_permission_help() -> None:
+    print("", file=sys.stderr)
+    print("Scroll Shot could not inspect the app under your pointer.", file=sys.stderr)
+    print("Grant Accessibility permission to Terminal, then run `scrollshot` again.", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("System Settings -> Privacy & Security -> Accessibility -> enable Terminal", file=sys.stderr)
+    print("You may also need Screen Recording permission for Terminal.", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("Manual region selection is still available with: scrollshot --target manual", file=sys.stderr)
+
+
 def build_helper(helper: Path, detect_helper: Path, countdown_helper: Path) -> None:
     helper.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(["swiftc", str(ROOT / "platform" / "macos" / "ScrollShotScrollHelper.swift"), "-o", str(helper)], check=True)
@@ -136,11 +147,8 @@ def main(argv: list[str] | None = None) -> int:
         except subprocess.CalledProcessError as exc:
             stderr = exc.stderr.strip() if exc.stderr else "Automatic detection failed."
             print(stderr, file=sys.stderr)
-            print("Falling back to manual selection. Use --target manual to go straight to this mode next time.")
-            selection = choose_region()
-            if selection is None:
-                print("Capture cancelled.")
-                return 1
+            print_permission_help()
+            return exc.returncode or 2
         else:
             selection = target.selection
             print(

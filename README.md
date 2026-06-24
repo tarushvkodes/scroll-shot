@@ -141,6 +141,10 @@ PYTHONPATH=src python3 -m scrollshot capture --target auto
 PYTHONPATH=src python3 -m scrollshot capture --target manual
 ```
 
+Automatic hover targeting does not fall back to the manual overlay. If macOS has
+not granted Accessibility permission yet, Scroll Shot exits and tells you what
+permission to enable.
+
 Run the deterministic stitcher test:
 
 ```bash
