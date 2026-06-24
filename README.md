@@ -91,9 +91,9 @@ chat UIs may still need tuning.
 make capture
 ```
 
-Then move your pointer over the content that should scroll during the countdown.
-Scroll Shot asks macOS Accessibility for the UI region under the pointer and
-captures that region. No drawing is needed.
+Then move your pointer over the content that should scroll during the visible
+five-second countdown. Scroll Shot asks macOS Accessibility for the UI region
+under the pointer and captures that region. No drawing is needed.
 
 Keep the target visible while Scroll Shot captures and scrolls.
 
@@ -115,6 +115,7 @@ Useful options:
 PYTHONPATH=src python3 -m scrollshot capture \
   --output captures/thread.png \
   --frames 24 \
+  --hover-delay 5 \
   --delta-y 750 \
   --scroll-ticks 7 \
   --delay 0.55 \

@@ -5,9 +5,9 @@ from datetime import datetime
 from pathlib import Path
 import subprocess
 import sys
-import time
 
 from .capture import capture_sequence
+from .countdown import show_hover_countdown
 from .selection import choose_region
 from .selftest import run_selftest, run_sticky_header_selftest
 from .stitch import stitch_frames
@@ -17,12 +17,14 @@ from .targeting import detect_frontmost_scroll_region
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_HELPER = ROOT / "bin" / "scrollshot-scroll"
 DEFAULT_DETECT_HELPER = ROOT / "bin" / "scrollshot-detect"
+DEFAULT_COUNTDOWN_HELPER = ROOT / "bin" / "scrollshot-countdown"
 
 
-def build_helper(helper: Path, detect_helper: Path) -> None:
+def build_helper(helper: Path, detect_helper: Path, countdown_helper: Path) -> None:
     helper.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(["swiftc", str(ROOT / "platform" / "macos" / "ScrollShotScrollHelper.swift"), "-o", str(helper)], check=True)
     subprocess.run(["swiftc", str(ROOT / "platform" / "macos" / "ScrollShotDetectHelper.swift"), "-o", str(detect_helper)], check=True)
+    subprocess.run(["swiftc", str(ROOT / "platform" / "macos" / "ScrollShotCountdownHelper.swift"), "-o", str(countdown_helper)], check=True)
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -50,6 +52,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     capture.add_argument("--delay", type=float, default=0.55, help="Seconds to wait after each scroll.")
     capture.add_argument("--helper", type=Path, default=DEFAULT_HELPER, help="Path to native scroll helper.")
     capture.add_argument("--detect-helper", type=Path, default=DEFAULT_DETECT_HELPER, help="Path to native target detector.")
+    capture.add_argument("--countdown-helper", type=Path, default=DEFAULT_COUNTDOWN_HELPER, help="Path to native countdown overlay.")
     capture.add_argument("--debug-dir", type=Path, help="Directory for raw frames and seam data.")
     capture.add_argument("--no-build-helper", action="store_true", help="Do not compile the Swift helper.")
     capture.add_argument(
@@ -59,7 +62,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="How to choose the scrolling region. Default: hover.",
     )
     capture.add_argument("--manual", action="store_true", help="Shortcut for --target manual.")
-    capture.add_argument("--hover-delay", type=float, default=3.0, help="Seconds to wait before detecting the region under the pointer.")
+    capture.add_argument("--hover-delay", type=float, default=5.0, help="Seconds to wait before detecting the region under the pointer.")
     capture.add_argument(
         "--no-calibrate",
         action="store_true",
@@ -99,12 +102,13 @@ def main(argv: list[str] | None = None) -> int:
 
     target_mode = "manual" if args.manual else args.target
 
-    if not args.helper.exists() or (target_mode != "manual" and not args.detect_helper.exists()):
+    needs_countdown = target_mode == "hover"
+    if not args.helper.exists() or (target_mode != "manual" and not args.detect_helper.exists()) or (needs_countdown and not args.countdown_helper.exists()):
         if args.no_build_helper:
             print("Missing native helper binary.", file=sys.stderr)
             return 2
         print("Building native macOS helpers...")
-        build_helper(args.helper, args.detect_helper)
+        build_helper(args.helper, args.detect_helper, args.countdown_helper)
 
     if target_mode == "manual":
         print("Select the scrollable region...")
@@ -116,9 +120,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         if target_mode == "hover":
             print("Move the pointer over the content that should scroll.")
-            for remaining in range(max(1, int(args.hover_delay)), 0, -1):
-                print(f"Detecting under pointer in {remaining}...")
-                time.sleep(1)
+            show_hover_countdown(args.countdown_helper, args.hover_delay)
             use_mouse = True
         else:
             print("Detecting the scrollable region in the frontmost window...")

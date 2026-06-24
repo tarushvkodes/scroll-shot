@@ -10,6 +10,7 @@ build-helper:
 	mkdir -p bin
 	swiftc platform/macos/ScrollShotScrollHelper.swift -o bin/scrollshot-scroll
 	swiftc platform/macos/ScrollShotDetectHelper.swift -o bin/scrollshot-detect
+	swiftc platform/macos/ScrollShotCountdownHelper.swift -o bin/scrollshot-countdown
 
 capture: build-helper
 	PYTHONPATH=src python3 -m scrollshot capture
